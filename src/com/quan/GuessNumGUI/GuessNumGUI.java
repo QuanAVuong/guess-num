@@ -16,45 +16,72 @@ import java.awt.event.ActionEvent;
 public class GuessNumGUI extends JFrame {
 	private JTextField txtInput;
 	private JLabel lblOutput;
+	private JLabel lblCount;
+	private JButton btnGuess;
+	
 	private int number;
+	private int guess;
+	private int count;
 	
 	public void evaluateGuess(){
 		String input = txtInput.getText();
 		String output = "";
 		
 		try {
-			int guess = Integer.parseInt(input);
+			guess = Integer.parseInt(input);
+			count--;
 			
-			if (  guess < number ) {
-				output = guess + " is too low";
-				lblOutput.setText(output);
+			if ( count > 0 ) {
+				if (  guess < number ) {
+					output = guess + " is too low";
+					lblOutput.setText(output);
+				}
+				else if (  guess > number ) {
+					output = guess + " is too high";
+					lblOutput.setText(output);
+				}
+				else {
+					output = guess + " is correct ! Play again!";
+					lblOutput.setText(output);
+					lblOutput.setForeground(Color.GREEN);
+					btnGuess.setEnabled(false);
+					txtInput.setEditable(false);
+					
+				}
+			} else {
+				lblOutput.setText("You've lost ! Play again!");
+				lblOutput.setForeground(Color.RED);
+				lblCount.setForeground(Color.RED);
+				btnGuess.setEnabled(false);
+				txtInput.setEditable(false);
 			}
-			else if (  guess > number ) {
-				output = guess + " is too high";
-				lblOutput.setText(output);
-			}
-			else {
-				output = guess + " is correct ! Play again!";
-				lblOutput.setText(output);
-				lblOutput.setForeground(new Color(0, 250, 0));
-				
-				newGame();
-			}
+
 		}
 		catch (Exception exc) {
 			lblOutput.setText("Whole number between 1 - 100 only please.");
-			lblOutput.setForeground(new Color(250, 0, 0));
+			lblOutput.setForeground(Color.RED);
 		}
 		finally {
+			lblCount.setText(count + " tries remaining...");
 			txtInput.requestFocus();
 			txtInput.selectAll();
-//			txtInput.setText("");
 		}
 	}
 	
 	public void newGame(){
 		number = (int) (Math.random() * 100 + 1);
+		count = 7;
 		
+		btnGuess.setEnabled(true);
+		
+		txtInput.setEditable(true);
+		txtInput.requestFocus();
+		txtInput.setText("");
+		
+		lblCount.setForeground(Color.ORANGE);
+		lblCount.setText("7 tries remaining...");
+		lblOutput.setText("Hint: guess 1 - 100, then hit that button (or enter)!");
+		lblOutput.setForeground(Color.ORANGE);
 	}
 	
 	public GuessNumGUI() {
@@ -84,22 +111,29 @@ public class GuessNumGUI extends JFrame {
 		txtInput = new JTextField();
 		txtInput.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				evaluateGuess();
+				if ( count <= 0 || guess == number)
+					lblCount.setText("Hit New Game!");
+				else
+					evaluateGuess();
+				
 			}
 		});
 		panel.add(txtInput);
 		txtInput.setColumns(10);
 		
-		JButton btnImFeelingLucky = new JButton("I'm Feeling Lucky !");
-		btnImFeelingLucky.addActionListener(new ActionListener() {
+		btnGuess = new JButton("I'm Feeling Lucky !");
+		btnGuess.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
-				evaluateGuess();
+				if ( count <= 0 || guess == number)
+					lblCount.setText("Hit New Game!");
+				else
+					evaluateGuess();
 			}
 		});
-		btnImFeelingLucky.setForeground(new Color(0, 204, 51));
-		btnImFeelingLucky.setBackground(new Color(0, 0, 0));
-		btnImFeelingLucky.setBounds(153, 160, 144, 29);
-		getContentPane().add(btnImFeelingLucky);
+		btnGuess.setForeground(new Color(0, 204, 51));
+		btnGuess.setBackground(new Color(0, 0, 0));
+		btnGuess.setBounds(63, 160, 144, 29);
+		getContentPane().add(btnGuess);
 		
 		lblOutput = new JLabel("Hint: guess 1 - 100, then hit that button (or enter)!");
 		lblOutput.setHorizontalAlignment(SwingConstants.CENTER);
@@ -107,6 +141,23 @@ public class GuessNumGUI extends JFrame {
 		lblOutput.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 13));
 		lblOutput.setBounds(6, 256, 438, 16);
 		getContentPane().add(lblOutput);
+		
+		lblCount = new JLabel("7 tries remaining...");
+		lblCount.setForeground(Color.ORANGE);
+		lblCount.setFont(new Font("Lucida Sans Typewriter", Font.BOLD, 13));
+		lblCount.setHorizontalAlignment(SwingConstants.CENTER);
+		lblCount.setBounds(116, 201, 223, 16);
+		getContentPane().add(lblCount);
+		
+		JButton btnNewGame = new JButton("New Game");
+		btnNewGame.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				newGame();
+			}
+		});
+		btnNewGame.setForeground(Color.MAGENTA);
+		btnNewGame.setBounds(270, 160, 117, 29);
+		getContentPane().add(btnNewGame);
 	}
 
 	public static void main(String[] args) {
@@ -114,6 +165,5 @@ public class GuessNumGUI extends JFrame {
 		guessNum.newGame();
 		guessNum.setSize(new Dimension(430, 330));
 		guessNum.setVisible(true);
-
 	}
 }
